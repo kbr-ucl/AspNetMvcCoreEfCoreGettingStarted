@@ -78,6 +78,7 @@ namespace ContosoUniversity.Controllers
 
             var student = await _context.Students.FindAsync(id);
             if (student == null) return NotFound();
+
             return View(student);
         }
 
@@ -98,11 +99,14 @@ namespace ContosoUniversity.Controllers
                     _context.Update(student);
                     await _context.SaveChangesAsync();
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateException)
                 {
                     if (!StudentExists(student.Id))
                         return NotFound();
-                    throw;
+                    //Log the error (uncomment ex variable name and write a log.)
+                    ModelState.AddModelError("", "Unable to save changes. " +
+                                                 "Try again, and if the problem persists, " +
+                                                 "see your system administrator.");
                 }
 
                 return RedirectToAction(nameof(Index));
